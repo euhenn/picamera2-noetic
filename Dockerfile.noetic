@@ -1,0 +1,45 @@
+FROM ros:noetic-ros-base
+
+RUN apt-get update && \
+  apt-get install -y ros-$ROS_DISTRO-rosserial-arduino ros-$ROS_DISTRO-rosserial git python3-pip && \
+  apt-get -y clean && \
+  apt-get -y purge && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+SHELL ["/bin/bash", "-c"]
+ENV CATKIN_WS /catkin_ws
+
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
+  mkdir -p $CATKIN_WS/src && \
+  cd $CATKIN_WS && \
+  catkin_make
+
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
+  cd $CATKIN_WS/src && \
+  git clone https://github.com/ros-drivers/rosserial.git && \
+  cd $CATKIN_WS && \
+  catkin_make && \
+  catkin_make install
+
+#Create ROS Serial Arduino builder
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
+  cd /tmp && \
+  rosrun rosserial_arduino make_libraries.py .
+
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY main_noetic.py ./main_noetic.py
+
+RUN mkdir -p /output
+
+WORKDIR /
+
+CMD ["python3", "main_noetic.py"]
+
+#Command to source ROS and start bash
+#CMD ["/bin/bash", "-c", "source /opt/ros/$ROS_DISTRO/setup.bash && source /catkin_ws/devel/setup.bash && python3 main_noetic.py"]
+
+
+
+
