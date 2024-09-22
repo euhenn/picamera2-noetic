@@ -23,4 +23,5 @@ RUN pip install --break-system-packages --no-cache-dir -r requirements_camera.tx
 WORKDIR /
 
 COPY main_picamera.py ./main_picamera.py
-CMD ["python3", "main_picamera.py"]
+#CMD ["python3", "main_picamera.py"]
+

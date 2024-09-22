@@ -29,13 +29,13 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY main_noetic.py ./main_noetic.py
+WORKDIR /
 
 RUN mkdir -p /output
 
-WORKDIR /
+COPY main_noetic.py ./main_noetic.py
 
-CMD ["python3", "main_noetic.py"]
+#CMD ["python3", "main_noetic.py"]
 
 #Command to source ROS and start bash
 #CMD ["/bin/bash", "-c", "source /opt/ros/$ROS_DISTRO/setup.bash && source /catkin_ws/devel/setup.bash && python3 main_noetic.py"]
