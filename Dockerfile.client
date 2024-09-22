@@ -3,7 +3,7 @@ FROM debian:bookworm
 RUN apt update && apt install -y --no-install-recommends gnupg
 
 RUN echo "deb http://archive.raspberrypi.org/debian/ bookworm main" > /etc/apt/sources.list.d/raspi.list \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
+     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 82B129927FA3303E
 
 RUN apt update && apt -y upgrade
 
@@ -15,13 +15,11 @@ RUN apt update && apt install -y --no-install-recommends \
      && rm -rf /var/cache/apt/archives/* \
      && rm -rf /var/lib/apt/lists/*
 
-COPY requirements_camera.txt .
-
 # Install Python dependencies (opencv-python-headless)
+COPY requirements_camera.txt .
 RUN pip install --break-system-packages --no-cache-dir -r requirements_camera.txt
 
 WORKDIR /
 
-COPY main_picamera.py ./main_picamera.py
-#CMD ["python3", "main_picamera.py"]
+COPY client.py ./client.py
 

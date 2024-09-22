@@ -1,37 +1,32 @@
 
 services:
-  ros:
+  server:
     build:
       context: .
-      dockerfile: Dockerfile.noetic
-    image: noetic_rosserial_opencv
-    container_name: noetic_rosserial_opencv_container
+      dockerfile: Dockerfile.server
+    image: picamera2_server
+    container_name: picamera2_server_container
     volumes:
-      - shared-volume:/var/run
-      - ./output:/output  # Mount host directory to save video
-      - /tmp/.X11-unix:/tmp/.X11-unix  # Mount the X11 socket for display
-    tty: true
+      - /tmp/.X11-unix:/tmp/.X11-unix  # X11 socket for display
+      - shared-volume:/tmp
+    privileged: true
     environment:
       - DISPLAY=$DISPLAY 
-      - ROS_DISTRO=noetic
-    #command: /bin/bash -c "source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && bash"
-    command: python3 "sleep 5 && main_noetic.py"
+    command: python3 "server.py"
     
-  picamera:
+  client:
     build:
       context: .
-      dockerfile: Dockerfile.picamera
-    image: picamera2_opencv
-    container_name: picamera2_opencv_container
+      dockerfile: Dockerfile.client
+    image: picamera2_client
+    container_name: picamera2_client_container
     volumes:
-      - /run/udev:/run/udev:ro
-      - shared-volume:/var/run
-      - ./output:/output
+      - shared-volume:/tmp
+      - /run/udev:/run/udev:ro # for picamera
     privileged: true
-    command: python3 "main_picamera.py"
-    #command: /bin/bash -c "sleep 5 && python3 main.py"
-    depends_on:
-      - ros
+    command: python3 "client.py"
+    #depends_on:
+    #  - server
 
 volumes:
   shared-volume:
